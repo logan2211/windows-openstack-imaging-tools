@@ -571,10 +571,17 @@ function Add-PackageToImage {
         [Parameter(Mandatory=$true)]
         [string]$packagePath,
         [Parameter(Mandatory=$false)]
-        [boolean]$ignoreErrors
+        [boolean]$ignoreErrors,
+        [Parameter(Mandatory=$false)]
+        [boolean]$preventPending
     )
     Write-Log ('Adding packages from "{0}" to image "{1}"' -f $packagePath, $winImagePath)
-    & Dism.exe /image:${winImagePath} /Add-Package /Packagepath:${packagePath}
+    if (!$preventPending) {
+        & Dism.exe /image:${winImagePath} /Add-Package /Packagepath:${packagePath}
+    }
+    else {
+        & Dism.exe /image:${winImagePath} /Add-Package /Packagepath:${packagePath} /PreventPending
+    }
     if ($LASTEXITCODE -and !$ignoreErrors) {
         throw "Dism failed to add packages from: $packagePath"
     } elseif ($LASTEXITCODE) {
@@ -1422,7 +1429,7 @@ function New-WindowsCloudImage {
         }
         if ($windowsImageConfig.extra_packages) {
             foreach ($package in $windowsImageConfig.extra_packages.split(",")) {
-                Add-PackageToImage $winImagePath $package -ignoreErrors $windowsImageConfig.extra_packages_ignore_errors
+                Add-PackageToImage $winImagePath $package -ignoreErrors $windowsImageConfig.extra_packages_ignore_errors -preventPending $windowsImageConfig.extra_packages_preventpending
             }
         }
         if ($windowsImageConfig.extra_capabilities) {

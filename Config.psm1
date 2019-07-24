@@ -166,6 +166,8 @@ function Get-AvailableConfigOptions {
           "Description" = "Clean up the image update package before packaging by running a
                            DISM Cleanup-Image command. This is useful when updates are
                            installed in extra_packages."}
+        @{"Name" = "extra_packages_preventpending"; "DefaultValue" = $false; "AsBoolean" = $true;
+          "Description" = "Allow setting the DISM /PreventPending flag when installing extra_packages."}
 
     )
 }
