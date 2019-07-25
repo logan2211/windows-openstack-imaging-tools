@@ -1439,6 +1439,9 @@ function New-WindowsCloudImage {
         if ($windowsImageConfig.extra_packages -and $windowsImageConfig.extra_packages_cleanup) {
             Clean-WindowsUpdates $winImagePath -PurgeUpdates $windowsImageConfig.purge_updates
         }
+
+        $driveLetter = (Get-Item $winImagePath).PSDrive.Name
+        Optimize-Volume -DriveLetter $driveLetter -Defrag -ReTrim -SlabConsolidate
     } finally {
         if (Test-Path $vhdPath) {
             Detach-VirtualDisk $vhdPath
